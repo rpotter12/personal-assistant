@@ -15,3 +15,7 @@ pip3 install gtts
 
 # for downloading songs
 pip3 install spotdl
+
+# for selenium
+pip3 install selenium
+pip3 install webdriver-manager
