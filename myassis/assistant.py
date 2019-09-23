@@ -17,7 +17,7 @@ microphone = sr.Microphone()
 # initialisation for text to speech
 # engine = pyttsx3.init() 
 
-# speech recognition function
+# speech recognition function(for speech to text)
 def command_recog():
     with microphone as source:
         recognizer.adjust_for_ambient_noise(source)
@@ -31,6 +31,7 @@ def command_recog():
         print(command)
         return command
 
+# for text to speech
 def speakvoice(mytext):
     # The text that you want to convert to audio 
     # mytext = 'Welcome Rohit Potter!'
@@ -90,6 +91,7 @@ while True:
         openwebbrowser(command)
         continue
 
+    # to exit from the software
     elif "exit" in command:
         os.system("exit()")
         break
