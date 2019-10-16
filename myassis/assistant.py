@@ -35,22 +35,43 @@ def command_recog():
 def speakvoice(mytext):
     # The text that you want to convert to audio 
     # mytext = 'Welcome Rohit Potter!'
-      
     # Language in which you want to convert 
     language = 'en'
-      
     # Passing the text and language to the engine,  
     # here we have marked slow=False. Which tells  
     # the module that the converted audio should  
     # have a high speed 
     myobj = gTTS(text=mytext, lang=language, slow=False) 
-      
     # Saving the converted audio in a mp3 file named 
     # welcome  
     myobj.save("welcome.mp3") 
-      
     # Playing the converted file 
     os.system("mpg321 welcome.mp3")
+
+# search song
+def searchsong(song):
+	path="/Music/"
+	song_list = os.listdir(path)
+	i=0
+	length=len(song_list)
+	for i in range(0,length):
+		if song in song_list[i]:
+			song = song_list[i]
+	return song
+
+# method for google search result
+def googlesearchresult(wanttosearch):
+	query = wanttosearch
+	for j in search(query, tld="co.in", num=10, stop=1, pause=2): 
+		print(j) 
+
+def openwebbrowser(search):
+    driver = webdriver.Chrome(ChromeDriverManager().install())
+    driver.get("https://www.google.co.in/")
+    wait = WebDriverWait(driver, 600)
+    xpath = '//*[@id="tsf"]/div[2]/div/div[1]/div/div[1]/input'
+    search_area = wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
+    search_area.send_keys(search + Keys.ENTER)
 
 while True:
     command = command_recog()
@@ -72,8 +93,11 @@ while True:
     	continue
 
     # to play songs
-    elif "play" in command:
-        command = command + ".mp3"
+    elif "play song" in command:
+        speakvoice("which song you want to play")
+        command = command_recog()
+        song = searchsong(command)
+        command = "xdg-open \"" + song + "\""
         speakvoice(command)
         os.system(command)
         continue
@@ -95,19 +119,4 @@ while True:
     elif "exit" in command:
         os.system("exit()")
         break
-
-# method for google search result
-def googlesearchresult(wanttosearch):
-	query = wanttosearch
-	for j in search(query, tld="co.in", num=10, stop=1, pause=2): 
-		print(j) 
-
-def openwebbrowser(search):
-    driver = webdriver.Chrome(ChromeDriverManager().install())
-    driver.get("https://www.google.co.in/")
-    wait = WebDriverWait(driver, 600)
-    xpath = '//*[@id="tsf"]/div[2]/div/div[1]/div/div[1]/input'
-    search_area = wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
-    search_area.send_keys(search + Keys.ENTER)
-
 
