@@ -1,7 +1,7 @@
 import speech_recognition as sr
 from googlesearch import search
 import pyttsx3
-import os
+import os, glob
 import spotdl
 from gtts import gTTS 
 
@@ -48,23 +48,12 @@ def speakvoice(mytext):
     # Playing the converted file 
     os.system("mpg321 welcome.mp3")
 
-# search song
-def searchsong(song):
-	path="/Music/"
-	song_list = os.listdir(path)
-	i=0
-	length=len(song_list)
-	for i in range(0,length):
-		if song in song_list[i]:
-			song = song_list[i]
-	return song
-
 # method for google search result
 def googlesearchresult(wanttosearch):
-	query = wanttosearch
-	for j in search(query, tld="co.in", num=10, stop=1, pause=2): 
+	for j in search(wanttosearch, tld="co.in", num=10, stop=1, pause=2): 
 		print(j) 
 
+# open web browser and search results on it
 def openwebbrowser(search):
     driver = webdriver.Chrome(ChromeDriverManager().install())
     driver.get("https://www.google.co.in/")
@@ -73,50 +62,84 @@ def openwebbrowser(search):
     search_area = wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
     search_area.send_keys(search + Keys.ENTER)
 
-while True:
-    command = command_recog()
+# load all song into a file
+def load_all_songs():
+	global ALL_SONGS
+	ALL_SONGS = [] 
+	song = glob.glob("/home/rohit/Music/*")
+	for i in song:
+		ALL_SONGS.append(i)
 
-    # to tell what command is given
-    if command == 'speak again':
-        speakvoice(command)
+# find song in the list
+def find_song(name):
+	for i in ALL_SONGS:
+		if name.lower() in i.lower():
+			temp_name = i.split("/home/rohit/music/")
+			name = temp_name[-1]
+			return name
+
+load_all_songs()
+
+while True:
+	command = command_recog()
+	# to tell what command is given
+	if command == 'speak again':
+		speakvoice(command)
 
     # to show google search result
-    elif "show result for " in command:
-    	googlesearchresult(command)
-    	continue
+	elif "show result for " in command:
+		googlesearchresult(command)
+		continue
 
-    # to get instruction for downloading song
-    elif "how to play song " in command:
-    	result = "say play song name"
-    	print(result)
-    	speakvoice(result)
-    	continue
+	# to get instruction for downloading song
+	elif "how to play song " in command:
+		result = "say play song name"
+		print(result)
+		speakvoice(result)
+		continue
 
     # to play songs
-    elif "play song" in command:
-        speakvoice("which song you want to play")
-        command = command_recog()
-        song = searchsong(command)
-        command = "xdg-open \"" + song + "\""
-        speakvoice(command)
-        os.system(command)
-        continue
+	elif "play song" in command:
+		speakvoice("which song you want to play")
+		song = command_recog()
+		newsong=find_song(song)
 
-    # to download songs
-    elif "download song" in command:
-        speakvoice("which song you want to download")
-        song = command_recog()
-        songdownloadcommand = 'spotdl --song "'+song+'"'
-        os.system(songdownloadcommand)
-        continue
+		"""
+		# method to search the exact name of the searched song
+		path="/home/rohit/Music/"
+		song_list = os.listdir(path)
+		print(song_list)
+		i=0
+		length=len(song_list)
+		newsong = "abc"
+		for i in range(0,length):
+			if song in song_list[i].lower():
+				newsong = song_list[i]
+		"""
 
-    # to show search result in web browser
-    elif "search" in command:
-        openwebbrowser(command)
-        continue
+		print(newsong)
 
-    # to exit from the software
-    elif "exit" in command:
-        os.system("exit()")
-        break
+		command = "xdg-open \"" + newsong + "\""
+		speakvoice(command)
+		os.system(command)
+		continue
+
+	# to download songs
+	elif "download song" in command:
+		speakvoice("which song you want to download")
+		song = command_recog()
+		songdownloadcommand = 'spotdl --song "'+song+'"'
+		os.system(songdownloadcommand)
+		load_all_songs() #append that song in songs file after downloading
+		continue
+
+	# to show search result in web browser
+	elif "search" in command:
+		openwebbrowser(command)
+		continue
+
+	# to exit from the software
+	elif "exit" in command:
+		os.system("exit()")
+		break
 
