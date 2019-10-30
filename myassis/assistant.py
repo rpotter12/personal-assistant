@@ -70,6 +70,11 @@ def load_all_songs():
 	for i in song:
 		ALL_SONGS.append(i)
 
+# delete all song from the list
+def del_all_songs():
+	for i in All_SONGS:
+		ALL_SONGS.remove(i)
+
 # find song in the list
 def find_song(name):
 	for i in ALL_SONGS:
@@ -130,7 +135,8 @@ while True:
 		song = command_recog()
 		songdownloadcommand = 'spotdl --song "'+song+'"'
 		os.system(songdownloadcommand)
-		load_all_songs() #append that song in songs file after downloading
+		del_all_songs() #empty whole list
+		load_all_songs() #append all song in songs file after downloading
 		continue
 
 	# to show search result in web browser
